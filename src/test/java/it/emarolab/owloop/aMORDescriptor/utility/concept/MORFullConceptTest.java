@@ -24,6 +24,7 @@ public class MORFullConceptTest {
     @AfterClass // called after all @Test-s
     public static void save() throws Exception{
         concept.saveOntology( "src/test/resources/conceptTest.owl");
+        System.out.println( "SAVED");
     }
 
     @Test
@@ -151,7 +152,6 @@ public class MORFullConceptTest {
         concept.addClassRestriction( "ClassRestriction");
         concept.writeSemantic();
         assertSemantic();
-
         concept.addClassRestriction( "ClassRestriction");
         concept.writeSemantic();
         assertSemantic();
