@@ -4,12 +4,16 @@ import it.emarolab.owloop.aMORDescriptor.utility.individual.MORFullIndividual;
 import it.emarolab.owloop.aMORDescriptor.MORAxioms;
 import static org.junit.Assert.*;
 
+import it.emarolab.owloop.core.Individual;
 import it.emarolab.owloop.core.Semantic;
 import jdk.internal.org.objectweb.asm.tree.analysis.Value;
 import org.apache.jena.base.Sys;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
+import org.semanticweb.owlapi.model.OWLNamedIndividual;
+import org.semanticweb.owlapi.model.OWLObjectProperty;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -57,6 +61,8 @@ public class scoreInitialization {
     //individuals
     String SCORE_INDIVIDUAL_TOTAL_EPISODIC="totalEpisodic";
     String SCORE_INDIVIDUAL_TOTAL_SEMANTIC="totalSemantic";
+    String SCORE_OBJ_PROP_IS_SUB_CLASS_OF="isSubClassOf";
+    String SCORE_OBJ_PROP_IS_SUPER_CLASS_OF="isSuperClassOf";
     //wheights
     double SEMANTIC_WEIGHT_1=0.15;
     double SEMANTIC_WEIGHT_2=0.15;
@@ -67,7 +73,7 @@ public class scoreInitialization {
     double EPISODIC_WEIGHT_2=0.6;
     @Before // called a before every @Test
     public void setup() {
-        score = new MORFullIndividual("score",
+        score = new MORFullIndividual("score0",
                 "score-ontology",
                 "src/test/resources/carlotta/score-ontology.owl",
                 "http://www.semanticweb.org/carlotta-sartore/scoreOntology");
@@ -75,14 +81,9 @@ public class scoreInitialization {
                 ONTO_NAME,
                 FILE_PATH,
                 IRI_ONTO);
-      for (int i=0; i<5;i++){
-          String s="score"+String.valueOf(i);
-          subClasses.add(s);
-      }
-        for (int i=5; i<10;i++){
-            String s="score"+String.valueOf(i);
-            superClasses.add(s);
-        }
+      subClasses.add("score1");
+      subClasses.add("score2");
+      superClasses.add("score4");
     }
     @AfterClass // called after all @Test-s
     public static void save() throws Exception{
@@ -123,11 +124,18 @@ public class scoreInitialization {
         System.out.println("added score property");
         //updating the total score
         UpdateSemanticScore((float) scoreComputed);
-        updateSuperClassesScore(superClasses,(float)scoreComputed);
-
-
-
+        //adding the property is superClassOf
+        for (String s:subClasses){
+            score.addObject(SCORE_OBJ_PROP_IS_SUPER_CLASS_OF,s);
+        }
+        //addind data prop is subclass of
+        for(String s:superClasses){
+            score.addObject(SCORE_OBJ_PROP_IS_SUB_CLASS_OF,s);
+        }
+        score.writeSemantic();
+        updateSuperClassScore(superClasses,(float) scoreComputed);
     }
+
 
     private double computeScore(int numberSubClasses,float scoreSubClasses,
                                 int numberBelongingIndividual,float scoreIndividual,
@@ -145,7 +153,6 @@ public class scoreInitialization {
                 EPISODIC_WEIGHT_2*episodic_retrieval);
 
     };
-
     public void assertSemantic(){ // asserts that the state of the java representation is equal to the state of the ontology
         assertEquals( score.getDisjointIndividual(), score.queryDisjointIndividual());
         assertEquals(score.getEquivalentIndividual(), score.queryEquivalentIndividual());
@@ -153,7 +160,6 @@ public class scoreInitialization {
         assertEquals( score.getObjectIndividual(), score.queryObjectIndividual());
         assertEquals( score.getDataIndividual(), score.queryDataIndividual());
     }
-
     public void UpdateSemanticScore(float scoreComputed){
         totalScore.readSemantic();
         MORAxioms.DataSemantics dataprop=totalScore.getDataIndividual();
@@ -165,7 +171,6 @@ public class scoreInitialization {
         totalScore.writeSemantic();
         assertSemantic();
     }
-
     public void UpdateSemanticScore(float oldScore, float newScore){
         totalScore.readSemantic();
         MORAxioms.DataSemantics dataprop=totalScore.getDataIndividual();
@@ -179,8 +184,6 @@ public class scoreInitialization {
         assertSemantic();
 
     }
-
-
     public  float  computeSubClassesScore(Set<String> subclasses){
         float total=0;
         for(String nameSubClass:subclasses){
@@ -195,11 +198,8 @@ public class scoreInitialization {
 
       return total;
     }
-
-
     // function which returns the first Float  value
-    public float ValueOfDataPropertyFloat(MORAxioms.DataSemantics dataProperties,
-                                          String dataPropertyName){
+    public float ValueOfDataPropertyFloat(MORAxioms.DataSemantics dataProperties, String dataPropertyName){
         for (MORAxioms.DataSemantic i:dataProperties){
             if(i.toString().contains(dataPropertyName)){
                 String str = i.toString().replaceAll("[^\\d.]","");
@@ -209,119 +209,126 @@ public class scoreInitialization {
         }
         return ((float)-1.0);
         }
+   public void updateSuperClassScore(Set<String> setName,float scoreOld,float scoreNew){
+            //if the set of string is empty hence there is no super class the functions
+       //automatically returns
+       if(setName.isEmpty()){
+           return;
+       }
+       //for all the string
+       for (String name:setName) {
+           //define the MOR individual of such superclass
+           MORFullIndividual superClasses = new MORFullIndividual(
+                   name,
+                   ONTO_NAME,
+                   FILE_PATH,
+                   IRI_ONTO
 
-        // update subclasses after the score of a class is modified.
-        // if the boolean is true it means that a new class has been added hence also the number of
-        public void updateSuperClassesScore(Set<String> superClasses,
-                                               float scoreSubClass){
+           );
+           //read the ontology
+           superClasses.readSemantic();
+           //take data property
+           MORAxioms.DataSemantics dataProp=superClasses.getDataIndividual();
+           //update the subclasses score with the new one
+           float scoreSubClasses=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_SUB_CLASSES);
+           scoreSubClasses-=scoreOld;
+           scoreSubClasses+=scoreNew;
+           //compute the new score
+           float newScore=(float) computeScore((int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_SUB_CLASSES),
+                   scoreSubClasses,
+                   (int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL),
+                   ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_BELONGING_INDIVIDUAL),
+                   (int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_RETRIEVAL));
+           //store the old score
+           float oldScore=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_HAS_VALUE);
+           //change the value of the data prop score
+           superClasses.removeData(SCORE_PROP_HAS_SCORE);
+           superClasses.addData(SCORE_PROP_HAS_SCORE,newScore);
+           superClasses.removeData(SCORE_PROP_SCORE_SUB_CLASSES);
+           superClasses.addData(SCORE_PROP_SCORE_SUB_CLASSES,scoreSubClasses);
+           //write the semantic
+           superClasses.writeSemantic();
+           superClasses.readSemantic();
+           //find the super classes of such element
+           MORAxioms.ObjectSemantics objProp = superClasses.getObjectIndividual();
+           Set<String> classes = new HashSet<String>();
+           //check if there is any superclasses
+           for (MORAxioms.ObjectSemantic obj : objProp) {
+               if (obj.toString().contains(SCORE_OBJ_PROP_IS_SUB_CLASS_OF)) {
+                   MORAxioms.Individuals ind = obj.getValues();
+                   for (OWLNamedIndividual i : ind) {
+                       //add to the string the new score
+                       classes.add(i.toStringID().substring(IRI_ONTO.length() + 1));
+                   }
 
-        for (String s:superClasses){
-            MORFullIndividual superClass=new MORFullIndividual(
-                    s,
+               }
+           }
+           //end check if subclasses
+           UpdateSemanticScore(oldScore,newScore);
+           updateSuperClassScore(classes,oldScore,newScore);
+       }
+   }
+   public void updateSuperClassScore(Set<String> setName,float score){
+        //if the set of string is empty hence there is no super class the functions
+        //automatically returns
+        if(setName.isEmpty()){
+            return;
+        }
+        //for all the string
+        for (String name:setName) {
+            //define the MOR individual of such superclass
+            MORFullIndividual superClasses = new MORFullIndividual(
+                    name,
                     ONTO_NAME,
                     FILE_PATH,
                     IRI_ONTO
-            );
-            superClass.readSemantic();
-            MORAxioms.DataSemantics dataProperty=superClass.getDataIndividual();
-            float  subClassesScore=ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_SCORE_SUB_CLASSES
-            );
-            UpdateSemanticScore(subClassesScore,subClassesScore+scoreSubClass);
-            subClassesScore+=scoreSubClass;
-            int numberSubClasses=(int) ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_NUMBER_SUB_CLASSES
-            );
-
-                numberSubClasses++;
-            int numberIndividuals=(int) ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL
-            );
-            float scoreIndividual=ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL
-            );
-
-            int numberRetrieval = (int) ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_NUMBER_RETRIEVAL
-            );
-
-            double  score=computeScore(
-                    numberSubClasses,
-                    scoreSubClass,
-                    numberIndividuals,
-                    scoreIndividual,
-                    numberRetrieval
-            );
-
-            superClass.removeData(SCORE_PROP_HAS_SCORE);
-            superClass.addData(SCORE_PROP_HAS_SCORE,score);
-            superClass.removeData(SCORE_PROP_SCORE_SUB_CLASSES);
-            superClass.addData(SCORE_PROP_SCORE_SUB_CLASSES,subClassesScore);
-            superClass.removeData(SCORE_PROP_NUMBER_SUB_CLASSES);
-            superClass.addData(SCORE_PROP_NUMBER_SUB_CLASSES,numberSubClasses);
-            superClass.writeSemantic();
-
-        }
-        }
-    
-    public void updateSuperClassesScore(Set<String> superClasses,
-                                        float scoreSubClassOld, float scoreSubClassNew){
-
-        for (String s:superClasses){
-            MORFullIndividual superClass=new MORFullIndividual(
-                    s,
-                    ONTO_NAME,
-                    FILE_PATH,
-                    IRI_ONTO
-            );
-            superClass.readSemantic();
-            MORAxioms.DataSemantics dataProperty=superClass.getDataIndividual();
-            float  subClassesScore=ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_SCORE_SUB_CLASSES
-            );
-            UpdateSemanticScore(subClassesScore,subClassesScore-scoreSubClassOld+scoreSubClassNew);
-            subClassesScore-=scoreSubClassOld;
-            subClassesScore+=scoreSubClassNew;
-            int numberSubClasses=(int) ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_NUMBER_SUB_CLASSES
-            );
-            int numberIndividuals=(int) ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL
-            );
-            float scoreIndividual=ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL
-            );
-
-            int numberRetrieval = (int) ValueOfDataPropertyFloat(
-                    dataProperty,
-                    SCORE_PROP_NUMBER_RETRIEVAL
-            );
-
-            double  score=computeScore(
-                    numberSubClasses,
-                    subClassesScore,
-                    numberIndividuals,
-                    scoreIndividual,
-                    numberRetrieval
 
             );
+            //read the ontology
+            superClasses.readSemantic();
+            //take data property
+            MORAxioms.DataSemantics dataProp=superClasses.getDataIndividual();
+            //update the subclasses score with the new one
+            float scoreSubClasses=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_SUB_CLASSES);
+            scoreSubClasses+=score;
+            int numberSubClasses=(int) ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_SUB_CLASSES);
+            numberSubClasses++;
+            //compute the new score
+            float newScore=(float) computeScore(numberSubClasses,
+                    scoreSubClasses,
+                    (int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL),
+                    ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_BELONGING_INDIVIDUAL),
+                    (int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_RETRIEVAL));
+            //store the old score
+            float oldScore=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_HAS_VALUE);
+            //change the value of the data prop score
+            superClasses.removeData(SCORE_PROP_HAS_SCORE);
+            superClasses.addData(SCORE_PROP_HAS_SCORE,newScore);
+            superClasses.addData(SCORE_PROP_HAS_SCORE,newScore);
+            superClasses.removeData(SCORE_PROP_NUMBER_SUB_CLASSES);
+            superClasses.addData(SCORE_PROP_NUMBER_SUB_CLASSES,numberSubClasses);
+            superClasses.removeData(SCORE_PROP_SCORE_SUB_CLASSES);
+            superClasses.addData(SCORE_PROP_SCORE_SUB_CLASSES,scoreSubClasses);
+            //write the semantic
+            superClasses.writeSemantic();
+            superClasses.readSemantic();
+            //find the super classes of such element
+            MORAxioms.ObjectSemantics objProp = superClasses.getObjectIndividual();
+            Set<String> classes = new HashSet<String>();
+            //check if there is any superclasses
+            for (MORAxioms.ObjectSemantic obj : objProp) {
+                if (obj.toString().contains(SCORE_OBJ_PROP_IS_SUB_CLASS_OF)) {
+                    MORAxioms.Individuals ind = obj.getValues();
+                    for (OWLNamedIndividual i : ind) {
+                        //add to the string the new score
+                        classes.add(i.toStringID().substring(IRI_ONTO.length() + 1));
+                    }
 
-            superClass.removeData(SCORE_PROP_HAS_SCORE);
-            superClass.addData(SCORE_PROP_HAS_SCORE,score);
-            superClass.removeData(SCORE_PROP_SCORE_SUB_CLASSES);
-            superClass.addData(SCORE_PROP_SCORE_SUB_CLASSES,subClassesScore);
-            superClass.removeData(SCORE_PROP_NUMBER_SUB_CLASSES);
-            superClass.addData(SCORE_PROP_NUMBER_SUB_CLASSES,numberSubClasses);
-            superClass.writeSemantic();
+                }
+            }
+            //end check if subclasses
+            UpdateSemanticScore(oldScore,newScore);
+            updateSuperClassScore(classes,oldScore,newScore);
         }
     }
 }
