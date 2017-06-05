@@ -77,12 +77,14 @@ public class scoreInitialization {
     double EPISODIC_WEIGHT_1=0.4;
     double EPISODIC_WEIGHT_2=0.6;
 
-    String CLASSES_OF="score1";
+    String CLASSES_OF="scene2";
+    String NAME_EPISODIC="score2";
+    String NAME_SEMANTIC="scene2";
     @Before // called a before every @Test
     //set up of all the variables
     public void setup() {
         //set up of the score
-        score = new MORFullIndividual("score3",
+        score = new MORFullIndividual(NAME_SEMANTIC,
                 "score-ontology",
                 "src/test/resources/carlotta/score-ontology.owl",
                 "http://www.semanticweb.org/carlotta-sartore/scoreOntology");
@@ -91,7 +93,7 @@ public class scoreInitialization {
                 ONTO_NAME,
                 FILE_PATH,
                 IRI_ONTO);
-        scoreEpisodic = new MORFullIndividual("scoreEpis",
+        scoreEpisodic = new MORFullIndividual(NAME_EPISODIC,
                 "score-ontology",
                 "src/test/resources/carlotta/score-ontology.owl",
                 "http://www.semanticweb.org/carlotta-sartore/scoreOntology");
@@ -102,11 +104,11 @@ public class scoreInitialization {
                 IRI_ONTO);
         //creating the vector containing all the super and sub classes
 
-     // subClasses.add("score0");
+      //subClasses.add("score0");
       //subClasses.add("score2");
-      superClasses.add("score1");
-      superClasses.add("score0");
-      subClasses.add("score2");
+      superClasses.add("scene1");
+      //superClasses.add("score0");
+      //subClasses.add("score2");
     }
     @AfterClass // called after all @Test-s
     public static void save() throws Exception{
@@ -165,8 +167,9 @@ public class scoreInitialization {
         score.writeSemantic();
         //updating super class score
         updateSuperClassScore(superClasses,(float) scoreComputed);
+        episodicInitialization();
     }
-    @Test
+
     public void episodicInitialization() {
         scoreEpisodic.readSemantic();
         scoreEpisodic.addTypeIndividual(SCORE_CLASS_EPISODIC_SCORE);
@@ -191,7 +194,8 @@ public class scoreInitialization {
         //assertSemantic();
         System.out.println("added score property");
         updateTotalEpisodicScore((float) scoreComputed);
-        updateSemanticFromIndividual(CLASSES_OF,"scoreEpis",(float) scoreComputed);
+        updateSemanticFromIndividual(CLASSES_OF,NAME_EPISODIC,(float) scoreComputed);
+
 
 
     }
@@ -498,7 +502,7 @@ public class scoreInitialization {
                 SCORE_PROP_SCORE_BELONGING_INDIVIDUAL);
         scoreBelongingIndividual+=Score;
         int numberBelongingIndividual=(int) ValueOfDataPropertyFloat(semanticIndividual.getDataIndividual(),
-                SCORE_PROP_SCORE_BELONGING_INDIVIDUAL);
+                SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL);
         numberBelongingIndividual++;
         float newScoreSemantic=(float) computeScore(
                 (int)ValueOfDataPropertyFloat( semanticIndividual.getDataIndividual(),SCORE_PROP_NUMBER_SUB_CLASSES),
@@ -507,7 +511,7 @@ public class scoreInitialization {
                 scoreBelongingIndividual,
                 (int) ValueOfDataPropertyFloat(semanticIndividual.getDataIndividual(),SCORE_PROP_NUMBER_RETRIEVAL)
         );
-        UpdateSemanticScore(ValueOfDataPropertyFloat(semanticIndividual.getDataIndividual(),SCORE_PROP_HAS_SCORE));
+        UpdateSemanticScore(ValueOfDataPropertyFloat(semanticIndividual.getDataIndividual(),SCORE_PROP_HAS_SCORE),newScoreSemantic);
         Set<String> classes =new HashSet<String>();
         for (MORAxioms.ObjectSemantic obj : semanticIndividual.getObjectIndividual()) {
             if (obj.toString().contains(SCORE_OBJ_PROP_IS_SUB_CLASS_OF)) {
