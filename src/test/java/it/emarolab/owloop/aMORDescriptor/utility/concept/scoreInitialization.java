@@ -73,7 +73,7 @@ public class scoreInitialization {
     double EPISODIC_WEIGHT_2=0.6;
     @Before // called a before every @Test
     public void setup() {
-        score = new MORFullIndividual("score0",
+        score = new MORFullIndividual("score3",
                 "score-ontology",
                 "src/test/resources/carlotta/score-ontology.owl",
                 "http://www.semanticweb.org/carlotta-sartore/scoreOntology");
@@ -81,9 +81,11 @@ public class scoreInitialization {
                 ONTO_NAME,
                 FILE_PATH,
                 IRI_ONTO);
-      subClasses.add("score1");
+     // subClasses.add("score0");
+      //subClasses.add("score2");
+      superClasses.add("score1");
+      superClasses.add("score0");
       subClasses.add("score2");
-      superClasses.add("score4");
     }
     @AfterClass // called after all @Test-s
     public static void save() throws Exception{
@@ -98,7 +100,7 @@ public class scoreInitialization {
         score.addTypeIndividual(SCORE_CLASS_SEMANTIC_SCORE);
         score.writeSemantic();
         score.readSemantic();
-        assertSemantic();
+        //assertSemantic();
        // add the correpsonding data properties
         //TODO there is a problem that sometimes it adds the subclasses number two times
         //instead of one
@@ -110,27 +112,31 @@ public class scoreInitialization {
         score.addData(SCORE_PROP_SCORE_SUB_CLASSES,computeSubClassesScore(subClasses));
         score.writeSemantic();
         score.readSemantic();
-        assertSemantic();
+        //assertSemantic();
         System.out.println("added data prop");
         //compute the score
-        double scoreComputed=computeScore(5,
-                10,
+        double scoreComputed=computeScore(subClasses.size(),
+                computeSubClassesScore(subClasses),
                 0,
                 0,
                 1);
         score.addData(SCORE_PROP_HAS_SCORE,scoreComputed);
         score.writeSemantic();
-        assertSemantic();
+        //assertSemantic();
         System.out.println("added score property");
         //updating the total score
         UpdateSemanticScore((float) scoreComputed);
         //adding the property is superClassOf
-        for (String s:subClasses){
-            score.addObject(SCORE_OBJ_PROP_IS_SUPER_CLASS_OF,s);
+        if(!subClasses.isEmpty()) {
+            for (String s : subClasses) {
+                score.addObject(SCORE_OBJ_PROP_IS_SUPER_CLASS_OF, s);
+            }
         }
         //addind data prop is subclass of
-        for(String s:superClasses){
-            score.addObject(SCORE_OBJ_PROP_IS_SUB_CLASS_OF,s);
+        if(!superClasses.isEmpty()) {
+            for (String s : superClasses) {
+                score.addObject(SCORE_OBJ_PROP_IS_SUB_CLASS_OF, s);
+            }
         }
         score.writeSemantic();
         updateSuperClassScore(superClasses,(float) scoreComputed);
@@ -141,6 +147,9 @@ public class scoreInitialization {
                                 int numberBelongingIndividual,float scoreIndividual,
                                 int retrieval){
         totalScore.readSemantic();
+        if(ValueOfDataPropertyFloat(totalScore.getDataIndividual(),SCORE_PROP_HAS_VALUE)==0){
+            return (SEMANTIC_WEIGHT_5*retrieval);
+        }
         return(   SEMANTIC_WEIGHT_1*numberBelongingIndividual+
                 SEMANTIC_WEIGHT_2*scoreIndividual+
                 SEMANTIC_WEIGHT_3*numberSubClasses+
@@ -163,28 +172,37 @@ public class scoreInitialization {
     public void UpdateSemanticScore(float scoreComputed){
         totalScore.readSemantic();
         MORAxioms.DataSemantics dataprop=totalScore.getDataIndividual();
-        String str = dataprop.toString().replaceAll("[^\\d.]","");
-        float f =Float.parseFloat(str.substring(1))+scoreComputed;
+        float oldTotal=ValueOfDataPropertyFloat(dataprop,SCORE_PROP_HAS_VALUE);
+        System.out.println("adding new score to total score");
+        System.out.print(oldTotal);
+        oldTotal+=scoreComputed;
+        System.out.print(oldTotal);
         totalScore.removeData(SCORE_PROP_HAS_VALUE);
         totalScore.writeSemantic();
-        totalScore.addData(SCORE_PROP_HAS_VALUE,f);
+        totalScore.addData(SCORE_PROP_HAS_VALUE,oldTotal);
         totalScore.writeSemantic();
-        assertSemantic();
+      //  assertSemantic();
     }
     public void UpdateSemanticScore(float oldScore, float newScore){
         totalScore.readSemantic();
         MORAxioms.DataSemantics dataprop=totalScore.getDataIndividual();
         float total=ValueOfDataPropertyFloat(dataprop,SCORE_PROP_HAS_VALUE);
+        System.out.println("modifying the score value");
+        System.out.print(total);
         total-=oldScore;
         total+=newScore;
+        System.out.print(total);
         totalScore.removeData(SCORE_PROP_HAS_VALUE);
         totalScore.writeSemantic();
         totalScore.addData(SCORE_PROP_HAS_VALUE,total);
         totalScore.writeSemantic();
-        assertSemantic();
+        //assertSemantic();
 
     }
     public  float  computeSubClassesScore(Set<String> subclasses){
+        if(subclasses.isEmpty()){
+            return 0;
+        }
         float total=0;
         for(String nameSubClass:subclasses){
             MORFullIndividual ind= new MORFullIndividual(nameSubClass,
@@ -210,9 +228,11 @@ public class scoreInitialization {
         return ((float)-1.0);
         }
    public void updateSuperClassScore(Set<String> setName,float scoreOld,float scoreNew){
-            //if the set of string is empty hence there is no super class the functions
+       System.out.println("updating score of superclasses");
+        //if the set of string is empty hence there is no super class the functions
        //automatically returns
        if(setName.isEmpty()){
+           System.out.println("THERE IS NO SUPERCLASS");
            return;
        }
        //for all the string
@@ -225,6 +245,7 @@ public class scoreInitialization {
                    IRI_ONTO
 
            );
+           System.out.println(name);
            //read the ontology
            superClasses.readSemantic();
            //take data property
@@ -240,7 +261,7 @@ public class scoreInitialization {
                    ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_BELONGING_INDIVIDUAL),
                    (int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_RETRIEVAL));
            //store the old score
-           float oldScore=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_HAS_VALUE);
+           float oldScore=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_HAS_SCORE);
            //change the value of the data prop score
            superClasses.removeData(SCORE_PROP_HAS_SCORE);
            superClasses.addData(SCORE_PROP_HAS_SCORE,newScore);
@@ -264,6 +285,11 @@ public class scoreInitialization {
                }
            }
            //end check if subclasses
+           System.out.println("updating total semantic");
+           System.out.print(oldScore);
+           System.out.println("oldScore");
+           System.out.print(newScore);
+           System.out.println("newScore");
            UpdateSemanticScore(oldScore,newScore);
            updateSuperClassScore(classes,oldScore,newScore);
        }
@@ -271,6 +297,7 @@ public class scoreInitialization {
    public void updateSuperClassScore(Set<String> setName,float score){
         //if the set of string is empty hence there is no super class the functions
         //automatically returns
+       System.out.println("adding superclasses score");
         if(setName.isEmpty()){
             return;
         }
@@ -284,6 +311,7 @@ public class scoreInitialization {
                     IRI_ONTO
 
             );
+            System.out.println(name);
             //read the ontology
             superClasses.readSemantic();
             //take data property
@@ -300,7 +328,7 @@ public class scoreInitialization {
                     ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_BELONGING_INDIVIDUAL),
                     (int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_RETRIEVAL));
             //store the old score
-            float oldScore=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_HAS_VALUE);
+            float oldScore=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_HAS_SCORE);
             //change the value of the data prop score
             superClasses.removeData(SCORE_PROP_HAS_SCORE);
             superClasses.addData(SCORE_PROP_HAS_SCORE,newScore);
@@ -327,6 +355,11 @@ public class scoreInitialization {
                 }
             }
             //end check if subclasses
+            System.out.println("updating total semantic");
+            System.out.print(oldScore);
+            System.out.println("oldScore");
+            System.out.print(newScore);
+            System.out.println("newScore");
             UpdateSemanticScore(oldScore,newScore);
             updateSuperClassScore(classes,oldScore,newScore);
         }
