@@ -75,8 +75,8 @@ public class scoreRetrieval {
     double EPISODIC_WEIGHT_1=0.4;
     double EPISODIC_WEIGHT_2=0.6;
 
-    String CLASSES_OF="scene1";
-    String NAME_EPISODIC="score1";
+   // String CLASSES_OF="scene1";
+    String NAME_EPISODIC="score2";
     String NAME_SEMANTIC="scene1";
     @Before // called a before every @Test
     //set up of all the variables
@@ -276,6 +276,34 @@ public class scoreRetrieval {
         totalScore.addData(SCORE_PROP_HAS_VALUE,total);
         totalScore.writeSemantic();
         //assertSemantic();
+
+    }
+    //@Test
+    public void episodicRetrieval(){
+        scoreEpisodic.readSemantic();
+        int numberEpisodicRetrieval=(int) ValueOfDataPropertyFloat(scoreEpisodic.getDataIndividual(),
+                SCORE_PROP_NUMBER_EPISODIC_RETRIEVAL);
+        numberEpisodicRetrieval++;
+        float newScore=(float) computeScore((int) ValueOfDataPropertyFloat(scoreEpisodic.getDataIndividual(),SCORE_PROP_NUMBER_SEMANTIC_RETRIEVAL),
+                numberEpisodicRetrieval);
+        updateTotalEpisodicScore(ValueOfDataPropertyFloat(scoreEpisodic.getDataIndividual(),SCORE_PROP_HAS_SCORE),
+                newScore);
+        for (MORAxioms.ObjectSemantic obj:scoreEpisodic.getObjectIndividual()){
+            if (obj.toString().contains(SCORE_OBJ_PROP_IS_INDIVIDUAL_OF)){
+                MORAxioms.Individuals ind = obj.getValues();
+                for (OWLNamedIndividual i : ind) {
+                    //add to the string the new individual
+                    updateSemanticFromIndividual(i.toStringID().substring(IRI_ONTO.length() + 1),
+                            ValueOfDataPropertyFloat(scoreEpisodic.getDataIndividual(),SCORE_PROP_HAS_SCORE),newScore);
+
+                }
+            }
+        }
+        scoreEpisodic.removeData(SCORE_PROP_NUMBER_EPISODIC_RETRIEVAL);
+        scoreEpisodic.addData(SCORE_PROP_NUMBER_EPISODIC_RETRIEVAL,numberEpisodicRetrieval);
+        scoreEpisodic.removeData(SCORE_PROP_HAS_SCORE);
+        scoreEpisodic.addData(SCORE_PROP_HAS_SCORE,newScore);
+        scoreEpisodic.writeSemantic();
 
     }
 
