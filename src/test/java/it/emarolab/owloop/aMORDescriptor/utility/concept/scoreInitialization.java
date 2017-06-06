@@ -77,9 +77,9 @@ public class scoreInitialization {
     double EPISODIC_WEIGHT_1=0.4;
     double EPISODIC_WEIGHT_2=0.6;
 
-    String CLASSES_OF="scene2";
-    String NAME_EPISODIC="score2";
-    String NAME_SEMANTIC="scene2";
+    String CLASSES_OF="scene1";
+    String NAME_EPISODIC="score1";
+    String NAME_SEMANTIC="scene1";
     @Before // called a before every @Test
     //set up of all the variables
     public void setup() {
@@ -106,7 +106,7 @@ public class scoreInitialization {
 
       //subClasses.add("score0");
       //subClasses.add("score2");
-      superClasses.add("scene1");
+      //superClasses.add("scene1");
       //superClasses.add("score0");
       //subClasses.add("score2");
     }

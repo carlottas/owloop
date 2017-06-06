@@ -75,9 +75,9 @@ public class scoreRetrieval {
     double EPISODIC_WEIGHT_1=0.4;
     double EPISODIC_WEIGHT_2=0.6;
 
-    String CLASSES_OF="scene2";
-    String NAME_EPISODIC="score2";
-    String NAME_SEMANTIC="scene2";
+    String CLASSES_OF="scene1";
+    String NAME_EPISODIC="score1";
+    String NAME_SEMANTIC="scene1";
     @Before // called a before every @Test
     //set up of all the variables
     public void setup() {
@@ -258,9 +258,18 @@ public class scoreRetrieval {
         MORAxioms.DataSemantics dataprop=totalScore.getDataIndividual();
         //reading the value of hasValue dataproperty
         float total=ValueOfDataPropertyFloat(dataprop,SCORE_PROP_HAS_VALUE);
+        System.out.println("updating total score \n");
+        System.out.println("previous value of total\n");
+        System.out.print(total);
         //updating the value
+        System.out.println("old value of the score");
+        System.out.print(oldScore);
+        System.out.println("new value of the score");
+        System.out.print(newScore);
         total-=oldScore;
         total+=newScore;
+        System.out.println("new value of total");
+        System.out.print(total);
         //updating the data property with the new value just computed
         totalScore.removeData(SCORE_PROP_HAS_VALUE);
         totalScore.writeSemantic();
@@ -382,10 +391,12 @@ public class scoreRetrieval {
                 (int)ValueOfDataPropertyFloat( semanticIndividual.getDataIndividual(),SCORE_PROP_NUMBER_SUB_CLASSES),
                 ValueOfDataPropertyFloat(semanticIndividual.getDataIndividual(),SCORE_PROP_SCORE_SUB_CLASSES),
                 (int) ValueOfDataPropertyFloat(semanticIndividual.getDataIndividual(),
-                        SCORE_PROP_SCORE_BELONGING_INDIVIDUAL),
+                        SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL),
                 scoreBelongingIndividual,
                 (int) ValueOfDataPropertyFloat(semanticIndividual.getDataIndividual(),SCORE_PROP_NUMBER_RETRIEVAL)
         );
+        System.out.println("new score of belonging individual");
+        System.out.print(scoreBelongingIndividual);
         UpdateSemanticScore(ValueOfDataPropertyFloat(semanticIndividual.getDataIndividual(),SCORE_PROP_HAS_SCORE),newScoreSemantic);
         Set<String> classes =new HashSet<String>();
         for (MORAxioms.ObjectSemantic obj : semanticIndividual.getObjectIndividual()) {

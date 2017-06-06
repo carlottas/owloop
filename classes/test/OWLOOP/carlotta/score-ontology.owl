@@ -144,12 +144,6 @@
     <Declaration>
         <AnnotationProperty IRI="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled"/>
     </Declaration>
-    <Declaration>
-        <NamedIndividual IRI="#score2"/>
-    </Declaration>
-    <Declaration>
-        <NamedIndividual IRI="#scene2"/>
-    </Declaration>
     <SubClassOf>
         <Class IRI="#EpisodicForgotten"/>
         <Class IRI="#Forgotten"/>
@@ -195,16 +189,8 @@
         <NamedIndividual IRI="#scene1"/>
     </ClassAssertion>
     <ClassAssertion>
-        <Class IRI="#SemanticScore"/>
-        <NamedIndividual IRI="#scene2"/>
-    </ClassAssertion>
-    <ClassAssertion>
         <Class IRI="#EpisodicScore"/>
         <NamedIndividual IRI="#score1"/>
-    </ClassAssertion>
-    <ClassAssertion>
-        <Class IRI="#EpisodicScore"/>
-        <NamedIndividual IRI="#score2"/>
     </ClassAssertion>
     <ClassAssertion>
         <Class IRI="#EpisodicScore"/>
@@ -219,19 +205,9 @@
         <NamedIndividual IRI="#totalSemantic"/>
     </DifferentIndividuals>
     <ObjectPropertyAssertion>
-        <ObjectProperty IRI="#isSubClassOf"/>
-        <NamedIndividual IRI="#scene2"/>
-        <NamedIndividual IRI="#scene1"/>
-    </ObjectPropertyAssertion>
-    <ObjectPropertyAssertion>
         <ObjectProperty IRI="#isIndividualOf"/>
         <NamedIndividual IRI="#score1"/>
         <NamedIndividual IRI="#scene1"/>
-    </ObjectPropertyAssertion>
-    <ObjectPropertyAssertion>
-        <ObjectProperty IRI="#isIndividualOf"/>
-        <NamedIndividual IRI="#score2"/>
-        <NamedIndividual IRI="#scene2"/>
     </ObjectPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#DefineFinalForgettingThreshold"/>
@@ -276,57 +252,27 @@
     <DataPropertyAssertion>
         <DataProperty IRI="#NumberRetrieval"/>
         <NamedIndividual IRI="#scene1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">1</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">2</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#NumberSubClasses"/>
         <NamedIndividual IRI="#scene1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">1</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
-        <DataProperty IRI="#ScoreBelongingIndividual"/>
-        <NamedIndividual IRI="#scene1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.6</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
-        <DataProperty IRI="#ScoreSubClasses"/>
-        <NamedIndividual IRI="#scene1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.625</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
-        <DataProperty IRI="#hasScore"/>
-        <NamedIndividual IRI="#scene1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.83629274</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
-        <DataProperty IRI="#NumberBelongingIndividual"/>
-        <NamedIndividual IRI="#scene2"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">1</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
-        <DataProperty IRI="#NumberRetrieval"/>
-        <NamedIndividual IRI="#scene2"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">1</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
-        <DataProperty IRI="#NumberSubClasses"/>
-        <NamedIndividual IRI="#scene2"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">0</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#ScoreBelongingIndividual"/>
-        <NamedIndividual IRI="#scene2"/>
+        <NamedIndividual IRI="#scene1"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.6</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#ScoreSubClasses"/>
-        <NamedIndividual IRI="#scene2"/>
+        <NamedIndividual IRI="#scene1"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.0</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#hasScore"/>
-        <NamedIndividual IRI="#scene2"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.625</Literal>
+        <NamedIndividual IRI="#scene1"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.04</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#NumberEpisodicRetrieval"/>
@@ -336,37 +282,22 @@
     <DataPropertyAssertion>
         <DataProperty IRI="#NumberSemanticRetrieval"/>
         <NamedIndividual IRI="#score1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">0</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">1</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#hasScore"/>
         <NamedIndividual IRI="#score1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.6</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
-        <DataProperty IRI="#NumberEpisodicRetrieval"/>
-        <NamedIndividual IRI="#score2"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">1</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
-        <DataProperty IRI="#NumberSemanticRetrieval"/>
-        <NamedIndividual IRI="#score2"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">0</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
-        <DataProperty IRI="#hasScore"/>
-        <NamedIndividual IRI="#score2"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.6</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.0</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#hasValue"/>
         <NamedIndividual IRI="#totalEpisodic"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.2</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.0</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#hasValue"/>
         <NamedIndividual IRI="#totalSemantic"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.4612927</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.89</Literal>
     </DataPropertyAssertion>
     <SubObjectPropertyOf>
         <ObjectProperty IRI="#isIndividualOf"/>
