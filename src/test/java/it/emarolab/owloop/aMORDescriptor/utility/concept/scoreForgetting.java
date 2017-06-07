@@ -85,8 +85,8 @@ public class scoreForgetting {
     double EPISODIC_WEIGHT_2=0.6;
 
     // String CLASSES_OF="scene1";
-    String NAME_EPISODIC="score2";
-    String NAME_SEMANTIC="scene1";
+    String NAME_EPISODIC="score1";
+    String NAME_SEMANTIC="scene2";
     @Before // called a before every @Test
     //set up of all the variables
     public void setup() {
@@ -183,6 +183,9 @@ public class scoreForgetting {
         updateTimes(lowScoreClassEpisodic,lowScoreEpisodicSet,SCORE_PROP_TIMES_LOW_SCORE);
         System.out.println("semantic low score");
         updateTimes(lowScoreClassSemantic,lowScoreSemanticSet,SCORE_PROP_TIMES_LOW_SCORE);
+        System.out.println("updating user decision");
+        userNoForget(NAME_EPISODIC,false);
+        userNoForget(NAME_SEMANTIC,true);
 
     }
     public float ValueOfDataPropertyFloat(MORAxioms.DataSemantics dataProperties, String dataPropertyName){
@@ -225,5 +228,15 @@ public class scoreForgetting {
         }
 
 
+    }
+    public void userNoForget(String name, Boolean userDecision){
+        MORFullIndividual ind= new MORFullIndividual(name,
+                ONTO_NAME,
+                FILE_PATH,
+                IRI_ONTO);
+        ind.readSemantic();
+        ind.removeData(SCORE_PROP_USER_NO_FORGET);
+        ind.addData(SCORE_PROP_USER_NO_FORGET,userDecision,true);
+        ind.writeSemantic();
     }
 }
