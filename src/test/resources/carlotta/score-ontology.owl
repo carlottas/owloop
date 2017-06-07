@@ -136,10 +136,22 @@
         <NamedIndividual IRI="#scene2"/>
     </Declaration>
     <Declaration>
+        <NamedIndividual IRI="#scene3"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#scene4"/>
+    </Declaration>
+    <Declaration>
         <NamedIndividual IRI="#score1"/>
     </Declaration>
     <Declaration>
         <NamedIndividual IRI="#score2"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#score3"/>
+    </Declaration>
+    <Declaration>
+        <NamedIndividual IRI="#score4"/>
     </Declaration>
     <Declaration>
         <NamedIndividual IRI="#totalEpisodic"/>
@@ -199,12 +211,28 @@
         <NamedIndividual IRI="#scene2"/>
     </ClassAssertion>
     <ClassAssertion>
+        <Class IRI="#SemanticForgotten"/>
+        <NamedIndividual IRI="#scene3"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#SemanticForgotten"/>
+        <NamedIndividual IRI="#scene4"/>
+    </ClassAssertion>
+    <ClassAssertion>
         <Class IRI="#EpisodicScore"/>
         <NamedIndividual IRI="#score1"/>
     </ClassAssertion>
     <ClassAssertion>
         <Class IRI="#EpisodicScore"/>
         <NamedIndividual IRI="#score2"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#EpisodicForgotten"/>
+        <NamedIndividual IRI="#score3"/>
+    </ClassAssertion>
+    <ClassAssertion>
+        <Class IRI="#EpisodicForgotten"/>
+        <NamedIndividual IRI="#score4"/>
     </ClassAssertion>
     <ClassAssertion>
         <Class IRI="#EpisodicScore"/>
@@ -339,9 +367,24 @@
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">3</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
+        <DataProperty IRI="#TimesForgotten"/>
+        <NamedIndividual IRI="#score1"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">22</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#TimesLowScore"/>
+        <NamedIndividual IRI="#score1"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">21</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#UserNoForget"/>
+        <NamedIndividual IRI="#score1"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">false</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
         <DataProperty IRI="#hasScore"/>
         <NamedIndividual IRI="#score1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">2.2</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.2</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#NumberEpisodicRetrieval"/>
@@ -891,7 +934,7 @@
                 <Variable IRI="#t"/>
             </DataPropertyAtom>
             <DataPropertyAtom>
-                <DataProperty IRI="#hasValue"/>
+                <DataProperty IRI="#hasScore"/>
                 <Variable IRI="#e"/>
                 <Variable IRI="#v"/>
             </DataPropertyAtom>
@@ -904,10 +947,6 @@
                 <Variable IRI="#r"/>
                 <Variable IRI="#l"/>
             </BuiltInAtom>
-            <ClassAtom>
-                <Class IRI="#TimeWindow"/>
-                <Variable IRI="#e"/>
-            </ClassAtom>
         </Body>
         <Head>
             <ClassAtom>
