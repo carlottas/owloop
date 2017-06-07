@@ -75,6 +75,7 @@ public class scoreForgetting {
     String SCORE_OBJ_PROP_IS_SUPER_CLASS_OF="isSuperClassOf";
     String SCORE_OBJ_PROP_IS_INDIVIDUAL_OF="isIndividualOf";
     String SCORE_OBJ_PROP_HAS_INDIVIDUAL="hasIndividual";
+    String SCORE_OBJ_PROP_FIRST_SUPERCLASS="firstSuperClass";
     //wheights
     double SEMANTIC_WEIGHT_1=0.15;
     double SEMANTIC_WEIGHT_2=0.15;
@@ -87,6 +88,7 @@ public class scoreForgetting {
     // String CLASSES_OF="scene1";
     String NAME_EPISODIC="score1";
     String NAME_SEMANTIC="scene2";
+    //TODO check the swrl ruels something is not working there
     @Before // called a before every @Test
     //set up of all the variables
     public void setup() {
@@ -186,6 +188,9 @@ public class scoreForgetting {
         System.out.println("updating user decision");
         userNoForget(NAME_EPISODIC,false);
         userNoForget(NAME_SEMANTIC,true);
+        Set<String> delete = new HashSet<String>();
+        delete.add("scene1");
+        deleteSemantic(delete);
 
     }
     public float ValueOfDataPropertyFloat(MORAxioms.DataSemantics dataProperties, String dataPropertyName){
@@ -238,5 +243,77 @@ public class scoreForgetting {
         ind.removeData(SCORE_PROP_USER_NO_FORGET);
         ind.addData(SCORE_PROP_USER_NO_FORGET,userDecision,true);
         ind.writeSemantic();
+    }
+    public void objectProperty(MORAxioms.ObjectSemantics objProp,String property,Set<String> individuals){
+        for (MORAxioms.ObjectSemantic obj : objProp) {
+            if (obj.toString().contains(property)) {
+                MORAxioms.Individuals ind = obj.getValues();
+                for (OWLNamedIndividual i : ind) {
+                    //add to the string the new score
+                    individuals.add(i.toStringID().substring(IRI_ONTO.length() + 1));
+                }
+
+            }
+        }
+    }
+    //TODO check how to delete and individual , maybe you have to remove it from all the class,
+    // can check the sit they should have done it there
+    public void deleteSemantic(Set<String> names){
+        for (String s:names) {
+            MORFullIndividual ind = new MORFullIndividual(s,
+                    ONTO_NAME,
+                    FILE_PATH,
+                    IRI_ONTO);
+            ind.readSemantic();
+            Set<String> superClass= new HashSet<String>();
+            Set<String> belongingIndividual = new HashSet<String>();
+            objectProperty(ind.getObjectIndividual(),SCORE_OBJ_PROP_FIRST_SUPERCLASS,superClass);
+            objectProperty(ind.getObjectIndividual(),SCORE_OBJ_PROP_HAS_INDIVIDUAL,belongingIndividual);
+            //Hyp it is unique
+            //All its individual will belong to the first superclass
+            for(String i:belongingIndividual) {
+                MORFullIndividual individual= new MORFullIndividual(i,
+                        ONTO_NAME,
+                        FILE_PATH,
+                        IRI_ONTO
+                );
+                individual.readSemantic();
+                individual.removeObject(SCORE_OBJ_PROP_IS_INDIVIDUAL_OF);
+                for (String sup : superClass) {
+                    individual.addObject(SCORE_OBJ_PROP_IS_INDIVIDUAL_OF,sup);
+                }
+                individual.writeSemantic();
+            }
+            //now that all the individual have been associated to the super class one can delate the individual
+            forgotClassSemantic.readSemantic();
+            forgotClassSemantic.removeIndividualClassified(s);
+            forgotClassEpisodic.writeSemantic();
+
+        }
+
+    }
+
+    public void deleteEpisodic(Set<String> names){
+        for (String name:names){
+            MORFullIndividual ind= new MORFullIndividual(name,
+                    ONTO_NAME,
+                    FILE_PATH,
+                    IRI_ONTO);
+            ind. readSemantic();
+            Set<String> classNames= new HashSet<String>();
+            objectProperty(ind.getObjectIndividual(),SCORE_OBJ_PROP_IS_INDIVIDUAL_OF,classNames);
+            //removing the property has individual from the corresponding class
+            for (String s:classNames){
+                MORFullIndividual classBelong= new MORFullIndividual(s,
+                        ONTO_NAME,
+                        FILE_PATH,
+                        IRI_ONTO);
+                classBelong.readSemantic();
+                classBelong.removeObject(SCORE_OBJ_PROP_HAS_INDIVIDUAL,name);
+                classBelong.writeSemantic();
+            }
+            //here you should delete the element TODO
+        }
+
     }
 }

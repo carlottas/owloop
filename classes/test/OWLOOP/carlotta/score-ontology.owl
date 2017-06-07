@@ -55,7 +55,13 @@
         <Class IRI="#ToBeForgotten"/>
     </Declaration>
     <Declaration>
+        <ObjectProperty IRI="#firstSuperClass"/>
+    </Declaration>
+    <Declaration>
         <ObjectProperty IRI="#hasIndividual"/>
+    </Declaration>
+    <Declaration>
+        <ObjectProperty IRI="#individualBelongingSubClass"/>
     </Declaration>
     <Declaration>
         <ObjectProperty IRI="#isIndividualOf"/>
@@ -247,6 +253,11 @@
         <NamedIndividual IRI="#totalSemantic"/>
     </DifferentIndividuals>
     <ObjectPropertyAssertion>
+        <ObjectProperty IRI="#firstSuperClass"/>
+        <NamedIndividual IRI="#scene1"/>
+        <NamedIndividual IRI="#scene2"/>
+    </ObjectPropertyAssertion>
+    <ObjectPropertyAssertion>
         <ObjectProperty IRI="#isSubClassOf"/>
         <NamedIndividual IRI="#scene2"/>
         <NamedIndividual IRI="#scene1"/>
@@ -254,7 +265,7 @@
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#isIndividualOf"/>
         <NamedIndividual IRI="#score1"/>
-        <NamedIndividual IRI="#scene1"/>
+        <NamedIndividual IRI="#scene2"/>
     </ObjectPropertyAssertion>
     <ObjectPropertyAssertion>
         <ObjectProperty IRI="#isIndividualOf"/>
@@ -322,14 +333,24 @@
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.4510417</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
+        <DataProperty IRI="#TimesForgotten"/>
+        <NamedIndividual IRI="#scene1"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">22</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#TimesLowScore"/>
+        <NamedIndividual IRI="#scene1"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">32</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
         <DataProperty IRI="#UserNoForget"/>
         <NamedIndividual IRI="#scene1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">true</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">false</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#hasScore"/>
         <NamedIndividual IRI="#scene1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.9894888</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.1</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#NumberBelongingIndividual"/>
@@ -357,6 +378,11 @@
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.0</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
+        <DataProperty IRI="#UserNoForget"/>
+        <NamedIndividual IRI="#scene2"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">true</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
         <DataProperty IRI="#hasScore"/>
         <NamedIndividual IRI="#scene2"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.425</Literal>
@@ -374,12 +400,17 @@
     <DataPropertyAssertion>
         <DataProperty IRI="#TimesForgotten"/>
         <NamedIndividual IRI="#score1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">23</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">24</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#TimesLowScore"/>
         <NamedIndividual IRI="#score1"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">27</Literal>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">29</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#UserNoForget"/>
+        <NamedIndividual IRI="#score1"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">false</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#hasScore"/>
@@ -417,9 +448,21 @@
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">3.4636183</Literal>
     </DataPropertyAssertion>
     <SubObjectPropertyOf>
+        <ObjectProperty IRI="#firstSuperClass"/>
+        <ObjectProperty abbreviatedIRI="owl:topObjectProperty"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
+        <ObjectProperty IRI="#individualBelongingSubClass"/>
+        <ObjectProperty abbreviatedIRI="owl:topObjectProperty"/>
+    </SubObjectPropertyOf>
+    <SubObjectPropertyOf>
         <ObjectProperty IRI="#isIndividualOf"/>
         <ObjectProperty abbreviatedIRI="owl:topObjectProperty"/>
     </SubObjectPropertyOf>
+    <InverseObjectProperties>
+        <ObjectProperty IRI="#firstSuperClass"/>
+        <ObjectProperty IRI="#individualBelongingSubClass"/>
+    </InverseObjectProperties>
     <InverseObjectProperties>
         <ObjectProperty IRI="#hasIndividual"/>
         <ObjectProperty IRI="#isIndividualOf"/>
@@ -429,7 +472,15 @@
         <ObjectProperty IRI="#isSuperClassOf"/>
     </InverseObjectProperties>
     <ObjectPropertyDomain>
+        <ObjectProperty IRI="#firstSuperClass"/>
+        <Class IRI="#EpisodicScore"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
         <ObjectProperty IRI="#hasIndividual"/>
+        <Class IRI="#SemanticScore"/>
+    </ObjectPropertyDomain>
+    <ObjectPropertyDomain>
+        <ObjectProperty IRI="#individualBelongingSubClass"/>
         <Class IRI="#SemanticScore"/>
     </ObjectPropertyDomain>
     <ObjectPropertyDomain>
@@ -445,7 +496,15 @@
         <Class IRI="#Score"/>
     </ObjectPropertyDomain>
     <ObjectPropertyRange>
+        <ObjectProperty IRI="#firstSuperClass"/>
+        <Class IRI="#SemanticScore"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
         <ObjectProperty IRI="#hasIndividual"/>
+        <Class IRI="#EpisodicScore"/>
+    </ObjectPropertyRange>
+    <ObjectPropertyRange>
+        <ObjectProperty IRI="#individualBelongingSubClass"/>
         <Class IRI="#EpisodicScore"/>
     </ObjectPropertyRange>
     <ObjectPropertyRange>
@@ -989,7 +1048,7 @@
                 <Variable IRI="#t"/>
             </DataPropertyAtom>
             <DataPropertyAtom>
-                <DataProperty IRI="#hasValue"/>
+                <DataProperty IRI="#hasScore"/>
                 <Variable IRI="#s"/>
                 <Variable IRI="#v"/>
             </DataPropertyAtom>
@@ -1016,10 +1075,6 @@
                 <Variable IRI="#f"/>
                 <Variable IRI="#u"/>
             </BuiltInAtom>
-            <ClassAtom>
-                <Class IRI="#TimeWindow"/>
-                <Variable IRI="#s"/>
-            </ClassAtom>
         </Body>
         <Head>
             <ClassAtom>
