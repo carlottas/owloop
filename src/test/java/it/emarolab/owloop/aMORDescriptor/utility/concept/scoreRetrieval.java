@@ -106,7 +106,7 @@ public class scoreRetrieval {
     public static void save() throws Exception{
         score.saveOntology("src/test/resources/carlotta/score-ontology.owl" );
     }
-    @Test
+   // @Test
     public void semanticRetrieval(){
         score.readSemantic();
        Set<String> belongingIndividuals=new HashSet <String>();
@@ -278,7 +278,7 @@ public class scoreRetrieval {
         //assertSemantic();
 
     }
-    //@Test
+    @Test
     public void episodicRetrieval(){
         scoreEpisodic.readSemantic();
         int numberEpisodicRetrieval=(int) ValueOfDataPropertyFloat(scoreEpisodic.getDataIndividual(),

@@ -77,9 +77,9 @@ public class scoreInitialization {
     double EPISODIC_WEIGHT_1=0.4;
     double EPISODIC_WEIGHT_2=0.6;
 
-    String CLASSES_OF="scene2";
-    String NAME_EPISODIC="score2";
-    String NAME_SEMANTIC="scene2";
+    String CLASSES_OF="scene3";
+    String NAME_EPISODIC="score5";
+    String NAME_SEMANTIC="scene3";
     @Before // called a before every @Test
     //set up of all the variables
     public void setup() {
@@ -105,16 +105,16 @@ public class scoreInitialization {
         //creating the vector containing all the super and sub classes
 
       //subClasses.add("score0");
-      //subClasses.add("score2");
+      subClasses.add("scene1");
+      superClasses.add("scene2");
       //superClasses.add("scene1");
-      superClasses.add("scene1");
       //subClasses.add("score2");
     }
     @AfterClass // called after all @Test-s
     public static void save() throws Exception{
         score.saveOntology("src/test/resources/carlotta/score-ontology.owl" );
     }
-    @Test
+    //@Test
     //function which initialize the semantic score
     //and update both superclass score and total score
     //1) create the individual with all the needed data properties
@@ -169,7 +169,7 @@ public class scoreInitialization {
         updateSuperClassScore(superClasses,(float) scoreComputed);
         episodicInitialization();
     }
-
+    @Test
     public void episodicInitialization() {
         scoreEpisodic.readSemantic();
         scoreEpisodic.addTypeIndividual(SCORE_CLASS_EPISODIC_SCORE);
