@@ -88,10 +88,10 @@
         <DataProperty IRI="#UserNoForget"/>
     </Declaration>
     <Declaration>
-        <ObjectProperty IRI="#firstSuperClass"/>
+        <Class IRI="#EpisodicScore"/>
     </Declaration>
     <Declaration>
-        <Class IRI="#EpisodicScore"/>
+        <ObjectProperty IRI="#firstSuperClass"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#TimesForgotten"/>
@@ -139,13 +139,16 @@
         <Class IRI="#EpisodicScoreLow"/>
     </Declaration>
     <Declaration>
-        <NamedIndividual IRI="#clock"/>
-    </Declaration>
-    <Declaration>
         <NamedIndividual IRI="#totalSemantic"/>
     </Declaration>
     <Declaration>
+        <NamedIndividual IRI="#clock"/>
+    </Declaration>
+    <Declaration>
         <DataProperty IRI="#DefineFinalForgettingThreshold"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#SumScoreBelongingIndividual"/>
     </Declaration>
     <Declaration>
         <DataProperty IRI="#NumberSemanticRetrieval"/>
@@ -167,6 +170,9 @@
     </Declaration>
     <Declaration>
         <NamedIndividual IRI="#scene3"/>
+    </Declaration>
+    <Declaration>
+        <DataProperty IRI="#SumScoreSubClasses"/>
     </Declaration>
     <SubClassOf>
         <Class IRI="#EpisodicForgotten"/>
@@ -378,12 +384,12 @@
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">0</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
-        <DataProperty IRI="#ScoreBelongingIndividual"/>
+        <DataProperty IRI="#SumScoreBelongingIndividual"/>
         <NamedIndividual IRI="#scene1"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.2</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
-        <DataProperty IRI="#ScoreSubClasses"/>
+        <DataProperty IRI="#SumScoreSubClasses"/>
         <NamedIndividual IRI="#scene1"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">0.0</Literal>
     </DataPropertyAssertion>
@@ -423,12 +429,12 @@
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">2</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
-        <DataProperty IRI="#ScoreBelongingIndividual"/>
+        <DataProperty IRI="#SumScoreBelongingIndividual"/>
         <NamedIndividual IRI="#scene2"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.2</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
-        <DataProperty IRI="#ScoreSubClasses"/>
+        <DataProperty IRI="#SumScoreSubClasses"/>
         <NamedIndividual IRI="#scene2"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">2.518048</Literal>
     </DataPropertyAssertion>
@@ -453,14 +459,14 @@
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#integer">1</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
-        <DataProperty IRI="#ScoreBelongingIndividual"/>
-        <NamedIndividual IRI="#scene3"/>
-        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.2</Literal>
-    </DataPropertyAssertion>
-    <DataPropertyAssertion>
         <DataProperty IRI="#ScoreSubClasses"/>
         <NamedIndividual IRI="#scene3"/>
         <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.564579</Literal>
+    </DataPropertyAssertion>
+    <DataPropertyAssertion>
+        <DataProperty IRI="#SumScoreBelongingIndividual"/>
+        <NamedIndividual IRI="#scene3"/>
+        <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#float">1.2</Literal>
     </DataPropertyAssertion>
     <DataPropertyAssertion>
         <DataProperty IRI="#hasScore"/>
@@ -702,6 +708,10 @@
         <DataProperty abbreviatedIRI="owl:topDataProperty"/>
     </SubDataPropertyOf>
     <SubDataPropertyOf>
+        <DataProperty IRI="#SumScoreBelongingIndividual"/>
+        <DataProperty abbreviatedIRI="owl:topDataProperty"/>
+    </SubDataPropertyOf>
+    <SubDataPropertyOf>
         <DataProperty IRI="#TimesForgotten"/>
         <DataProperty abbreviatedIRI="owl:topDataProperty"/>
     </SubDataPropertyOf>
@@ -813,6 +823,13 @@
         </DataExactCardinality>
     </DataPropertyDomain>
     <DataPropertyDomain>
+        <DataProperty IRI="#SumScoreBelongingIndividual"/>
+        <DataExactCardinality cardinality="1">
+            <DataProperty IRI="#SumScoreBelongingIndividual"/>
+            <Datatype abbreviatedIRI="xsd:float"/>
+        </DataExactCardinality>
+    </DataPropertyDomain>
+    <DataPropertyDomain>
         <DataProperty IRI="#TimesForgotten"/>
         <DataExactCardinality cardinality="1">
             <DataProperty IRI="#TimesForgotten"/>
@@ -897,6 +914,10 @@
     </DataPropertyRange>
     <DataPropertyRange>
         <DataProperty IRI="#ScoreSubClasses"/>
+        <Datatype abbreviatedIRI="xsd:float"/>
+    </DataPropertyRange>
+    <DataPropertyRange>
+        <DataProperty IRI="#SumScoreBelongingIndividual"/>
         <Datatype abbreviatedIRI="xsd:float"/>
     </DataPropertyRange>
     <DataPropertyRange>
@@ -1117,6 +1138,90 @@
                 <Class IRI="#SemanticScoreLow"/>
                 <Variable IRI="#s"/>
             </ClassAtom>
+        </Head>
+    </DLSafeRule>
+    <DLSafeRule>
+        <Annotation>
+            <AnnotationProperty IRI="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled"/>
+            <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">true</Literal>
+        </Annotation>
+        <Annotation>
+            <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+            <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string"></Literal>
+        </Annotation>
+        <Annotation>
+            <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+            <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">SCORE_BEL_IND</Literal>
+        </Annotation>
+        <Body>
+            <ClassAtom>
+                <Class IRI="#SemanticScore"/>
+                <Variable IRI="#s"/>
+            </ClassAtom>
+            <DataPropertyAtom>
+                <DataProperty IRI="#hasValue"/>
+                <NamedIndividual IRI="#totalEpisodic"/>
+                <Variable IRI="#t"/>
+            </DataPropertyAtom>
+            <DataPropertyAtom>
+                <DataProperty IRI="#SumScoreBelongingIndividual"/>
+                <Variable IRI="#s"/>
+                <Variable IRI="#v"/>
+            </DataPropertyAtom>
+            <BuiltInAtom IRI="http://www.w3.org/2003/11/swrlb#divide">
+                <Variable IRI="#r"/>
+                <Variable IRI="#v"/>
+                <Variable IRI="#t"/>
+            </BuiltInAtom>
+        </Body>
+        <Head>
+            <DataPropertyAtom>
+                <DataProperty IRI="#ScoreBelongingIndividual"/>
+                <Variable IRI="#s"/>
+                <Variable IRI="#r"/>
+            </DataPropertyAtom>
+        </Head>
+    </DLSafeRule>
+    <DLSafeRule>
+        <Annotation>
+            <AnnotationProperty IRI="http://swrl.stanford.edu/ontologies/3.3/swrla.owl#isRuleEnabled"/>
+            <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#boolean">true</Literal>
+        </Annotation>
+        <Annotation>
+            <AnnotationProperty abbreviatedIRI="rdfs:comment"/>
+            <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string"></Literal>
+        </Annotation>
+        <Annotation>
+            <AnnotationProperty abbreviatedIRI="rdfs:label"/>
+            <Literal datatypeIRI="http://www.w3.org/2001/XMLSchema#string">SCORE_SUB</Literal>
+        </Annotation>
+        <Body>
+            <ClassAtom>
+                <Class IRI="#SemanticScore"/>
+                <Variable IRI="#s"/>
+            </ClassAtom>
+            <DataPropertyAtom>
+                <DataProperty IRI="#hasValue"/>
+                <NamedIndividual IRI="#totalSemantic"/>
+                <Variable IRI="#t"/>
+            </DataPropertyAtom>
+            <DataPropertyAtom>
+                <DataProperty IRI="#SumScoreSubClasses"/>
+                <Variable IRI="#s"/>
+                <Variable IRI="#v"/>
+            </DataPropertyAtom>
+            <BuiltInAtom IRI="http://www.w3.org/2003/11/swrlb#divide">
+                <Variable IRI="#r"/>
+                <Variable IRI="#v"/>
+                <Variable IRI="#t"/>
+            </BuiltInAtom>
+        </Body>
+        <Head>
+            <DataPropertyAtom>
+                <DataProperty IRI="#ScoreSubClasses"/>
+                <Variable IRI="#s"/>
+                <Variable IRI="#r"/>
+            </DataPropertyAtom>
         </Head>
     </DLSafeRule>
     <DLSafeRule>

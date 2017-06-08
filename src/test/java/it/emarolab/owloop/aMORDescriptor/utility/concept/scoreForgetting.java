@@ -46,7 +46,7 @@ public class scoreForgetting {
     String SCORE_PROP_NUMBER_RETRIEVAL="NumberRetrieval";
     String SCORE_PROP_NUMBER_SEMANTIC_RETRIEVAL="NumberSemanticRetrieval";
     String SCORE_PROP_NUMBER_SUB_CLASSES="NumberSubClasses";
-    String SCORE_PROP_SCORE_BELONGING_INDIVIDUAL="ScoreBelongingIndividual";
+    String SCORE_PROP_SCORE_BELONGING_INDIVIDUAL="SumScoreBelongingIndividual";
     String SCORE_PROP_SCORE_SUB_CLASSES="ScoreSubClasses";
     String SCORE_PROP_HAS_SCORE="hasScore";
 
@@ -83,7 +83,7 @@ public class scoreForgetting {
     // String CLASSES_OF="scene1";
     String NAME_EPISODIC="score1";
     String NAME_SEMANTIC="scene2";
-   
+
     @Before // called a before every @Test
     //set up of all the variables
     public void setup() {
