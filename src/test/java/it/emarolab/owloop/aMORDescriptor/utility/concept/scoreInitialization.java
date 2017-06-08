@@ -222,12 +222,12 @@ public class scoreInitialization {
              scoreSubClasses=ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_SCORE_SUM_SUB_CLASSES);
         }
         else {
-             scoreSubClasses=ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_SCORE_SUB_CLASSES);
+             scoreSubClasses=0;
         }
        // if the total episodic is equal to 0
         if(ValueOfDataPropertyFloat(totalScoreEpisodic.getDataIndividual(),SCORE_PROP_HAS_VALUE)<0) {
 
-            scoreIndividual= ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_SCORE_SUM_BELONGING_INDIVIDUAL);
+            scoreIndividual= 1;
 
         }
         else{
