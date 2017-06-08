@@ -79,9 +79,9 @@ public class scoreInitialization {
     double EPISODIC_WEIGHT_1=0.4;
     double EPISODIC_WEIGHT_2=0.6;
 
-    String CLASSES_OF="scene3";
-    String NAME_EPISODIC="score4";
-    String NAME_SEMANTIC="scene3";
+    String CLASSES_OF="scene10";
+    String NAME_EPISODIC="score10";
+    String NAME_SEMANTIC="scene10";
     @Before // called a before every @Test
     //set up of all the variables
     public void setup() {
@@ -108,7 +108,7 @@ public class scoreInitialization {
 
       //subClasses.add("score0");
       subClasses.add("scene1");
-      //superClasses.add("scene2");
+      superClasses.add("scene2");
       //superClasses.add("scene1");
       //subClasses.add("score2");
     }
@@ -123,7 +123,7 @@ public class scoreInitialization {
     //2) compute the score
     //3) update the total score
     //4) update the superclasses score
-    //@Test
+    @Test
     public void semanticInitialization(){
         // add the individual to the class
         score.readSemantic();
@@ -138,6 +138,9 @@ public class scoreInitialization {
         score.addData(SCORE_PROP_NUMBER_RETRIEVAL,1);
         score.addData(SCORE_PROP_NUMBER_SUB_CLASSES,subClasses.size());
         score.addData(SCORE_PROP_SCORE_SUM_SUB_CLASSES,computeSubClassesScore(subClasses));
+        score.addData(SCORE_PROP_TIMES_FORGOTTEN,0);
+        score.addData(SCORE_PROP_TIMES_LOW_SCORE,0);
+        score.addData(SCORE_PROP_USER_NO_FORGET,false,true);
         score.writeSemantic();
         score.readSemantic();
         //assertSemantic();
@@ -168,7 +171,7 @@ public class scoreInitialization {
         updateSuperClassScore(superClasses,(float) scoreComputed);
         episodicInitialization();
     }
-   @Test
+   //@Test
     public void episodicInitialization() {
         scoreEpisodic.readSemantic();
         scoreEpisodic.addTypeIndividual(SCORE_CLASS_EPISODIC_SCORE);
@@ -179,6 +182,9 @@ public class scoreInitialization {
         System.out.println( "added individual to the class "+ SCORE_CLASS_EPISODIC_SCORE );
         scoreEpisodic.addData(SCORE_PROP_NUMBER_EPISODIC_RETRIEVAL,1);
         scoreEpisodic.addData(SCORE_PROP_NUMBER_SEMANTIC_RETRIEVAL,0);
+        scoreEpisodic.addData(SCORE_PROP_TIMES_FORGOTTEN,0);
+        scoreEpisodic.addData(SCORE_PROP_TIMES_LOW_SCORE,0);
+        scoreEpisodic.addData(SCORE_PROP_USER_NO_FORGET,false,true);
         //Add obj Property
         scoreEpisodic.addObject(SCORE_OBJ_PROP_IS_INDIVIDUAL_OF,CLASSES_OF);
         //compute the score and add it to the individual

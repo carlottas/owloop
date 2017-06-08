@@ -34,7 +34,7 @@ public class scoreForgetting {
     private static OWLReferences onto;
     //string with ontology name of instances
     String ONTO_NAME="score-ontology";
-    String FILE_PATH="src/test/resources/carlotta/score_example.owl";
+    String FILE_PATH="src/test/resources/carlotta/score-ontology.owl";
     String IRI_ONTO="http://www.semanticweb.org/carlotta-sartore/scoreOntology";
 
     String SCORE_PROP_TIMES_FORGOTTEN="TimesForgotten";
@@ -46,7 +46,9 @@ public class scoreForgetting {
     String SCORE_PROP_NUMBER_RETRIEVAL="NumberRetrieval";
     String SCORE_PROP_NUMBER_SEMANTIC_RETRIEVAL="NumberSemanticRetrieval";
     String SCORE_PROP_NUMBER_SUB_CLASSES="NumberSubClasses";
-    String SCORE_PROP_SCORE_BELONGING_INDIVIDUAL="SumScoreBelongingIndividual";
+    String SCORE_PROP_SCORE_SUM_BELONGING_INDIVIDUAL="SumScoreBelongingIndividual";
+    String SCORE_PROP_SCORE_SUM_SUB_CLASSES="SumScoreSubClasses";
+    String SCORE_PROP_SCORE_BELONGING_INDIVIDUAL="ScoreBelongingIndividual";
     String SCORE_PROP_SCORE_SUB_CLASSES="ScoreSubClasses";
     String SCORE_PROP_HAS_SCORE="hasScore";
 
@@ -135,7 +137,7 @@ public class scoreForgetting {
     }
     @AfterClass // called after all @Test-s
     public static void save() throws Exception{
-        forgotClassSemantic.saveOntology("src/test/resources/carlotta/score_example.owl" );
+        forgotClassSemantic.saveOntology("src/test/resources/carlotta/score-ontology.owl" );
     }
     @Test
     public void forgetting(){
@@ -146,6 +148,7 @@ public class scoreForgetting {
         forgotClassSemantic.readSemantic();
         MORAxioms.Individuals forgottenSemantic=forgotClassSemantic.getIndividualClassified();
         for (OWLNamedIndividual i:forgottenSemantic){
+            System.out.println("there is something to forgot in the semantic class");
             SemanticForgottenSet.add(i.toStringID().substring(IRI_ONTO.length() + 1));
         }
         deleteSemantic(SemanticForgottenSet);
@@ -260,7 +263,7 @@ public class scoreForgetting {
                     FILE_PATH,
                     IRI_ONTO);
             //Remove its score from the total semantic score
-            RemoveFromTotalSemanticScore(ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_HAS_SCORE));
+            UpdateSemanticScore(ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_HAS_SCORE),0);
             //read the current ontology state
             ind.readSemantic();
             //definition of the Sets for
@@ -332,15 +335,15 @@ public class scoreForgetting {
                     int numberBelongingIndividual = (int) ValueOfDataPropertyFloat(firstSup.getDataIndividual(),
                             SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL) + (int) ValueOfDataPropertyFloat(ind.getDataIndividual(), SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL);
                     //update the score of belonging individuals
-                    float scoreBelongingIndividual = ValueOfDataPropertyFloat(firstSup.getDataIndividual(), SCORE_PROP_SCORE_BELONGING_INDIVIDUAL) +
-                            ValueOfDataPropertyFloat(ind.getDataIndividual(), SCORE_PROP_SCORE_BELONGING_INDIVIDUAL);
+                    float scoreBelongingIndividual = ValueOfDataPropertyFloat(firstSup.getDataIndividual(), SCORE_PROP_SCORE_SUM_BELONGING_INDIVIDUAL) +
+                            ValueOfDataPropertyFloat(ind.getDataIndividual(), SCORE_PROP_SCORE_SUM_BELONGING_INDIVIDUAL);
                     //compute the newScore
-                    float newScore = (float) computeScore((int) ValueOfDataPropertyFloat(firstSup.getDataIndividual(), SCORE_PROP_NUMBER_SUB_CLASSES),
-                            ValueOfDataPropertyFloat(firstSup.getDataIndividual(), SCORE_PROP_SCORE_SUB_CLASSES),
-                            numberBelongingIndividual, scoreBelongingIndividual,
-                            (int) ValueOfDataPropertyFloat(firstSup.getDataIndividual(), SCORE_PROP_NUMBER_RETRIEVAL)
-                    );
-
+                    firstSup.removeData(SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL);
+                    firstSup.addData(SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL,numberBelongingIndividual);
+                    firstSup.removeData(SCORE_PROP_SCORE_SUM_BELONGING_INDIVIDUAL);
+                    firstSup.addData(SCORE_PROP_SCORE_SUM_BELONGING_INDIVIDUAL,scoreBelongingIndividual);
+                    firstSup.writeSemantic();
+                    float newScore = computeScore(firstSup);
                     //update the total semantic score
                     UpdateSemanticScore(ValueOfDataPropertyFloat(firstSup.getDataIndividual(), SCORE_PROP_HAS_SCORE), newScore);
                     //update superClasses score
@@ -348,10 +351,6 @@ public class scoreForgetting {
                     objectProperty(firstSup.getObjectIndividual(),SCORE_OBJ_PROP_IS_SUB_CLASS_OF,superClasses);
                     updateSuperClassScore(superClasses,ValueOfDataPropertyFloat(firstSup.getDataIndividual(),SCORE_PROP_HAS_SCORE),newScore);
                     //update the ontology
-                    firstSup.removeData(SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL);
-                    firstSup.addData(SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL, numberBelongingIndividual);
-                    firstSup.removeData(SCORE_PROP_SCORE_BELONGING_INDIVIDUAL);
-                    firstSup.addData(SCORE_PROP_SCORE_BELONGING_INDIVIDUAL, scoreBelongingIndividual);
                     firstSup.removeData(SCORE_PROP_HAS_SCORE);
                     firstSup.addData(SCORE_PROP_HAS_SCORE, newScore);
                     firstSup.writeSemantic();
@@ -378,23 +377,21 @@ public class scoreForgetting {
                 int numberSubClasses=(int) ValueOfDataPropertyFloat(superCl.getDataIndividual(),SCORE_PROP_NUMBER_SUB_CLASSES);
                     numberSubClasses--;
                 //update the score of subclass
-                float scoreSubClasses=ValueOfDataPropertyFloat(superCl.getDataIndividual(),SCORE_PROP_SCORE_SUB_CLASSES);
+                float scoreSubClasses=ValueOfDataPropertyFloat(superCl.getDataIndividual(),SCORE_PROP_SCORE_SUM_SUB_CLASSES);
                     scoreSubClasses-=ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_HAS_SCORE);
 
+                superCl.removeData(SCORE_PROP_NUMBER_SUB_CLASSES);
+                superCl.addData(SCORE_PROP_NUMBER_SUB_CLASSES,numberSubClasses);
+                superCl.removeData(SCORE_PROP_SCORE_SUM_SUB_CLASSES);
+                superCl.addData(SCORE_PROP_SCORE_SUM_SUB_CLASSES,scoreSubClasses);
+                superCl.writeSemantic();
                 //compute the new score
-                float newScore=(float) computeScore(numberSubClasses,scoreSubClasses,
-                            (int) ValueOfDataPropertyFloat(superCl.getDataIndividual(),SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL),
-                            ValueOfDataPropertyFloat(superCl.getDataIndividual(),SCORE_PROP_SCORE_BELONGING_INDIVIDUAL),
-                            (int) ValueOfDataPropertyFloat(superCl.getDataIndividual(),SCORE_PROP_NUMBER_RETRIEVAL));
+                float newScore=computeScore(superCl);
                 //update the semantic with the new score
                 UpdateSemanticScore(ValueOfDataPropertyFloat(superCl.getDataIndividual(),SCORE_PROP_HAS_SCORE),newScore);
                 //update the ontology
                 superCl.removeData(SCORE_PROP_HAS_SCORE);
                 superCl.addData(SCORE_PROP_HAS_SCORE,newScore);
-                superCl.removeData(SCORE_PROP_NUMBER_SUB_CLASSES);
-                superCl.addData(SCORE_PROP_NUMBER_SUB_CLASSES,numberSubClasses);
-                superCl.removeData(SCORE_PROP_SCORE_SUB_CLASSES);
-                superCl.addData(SCORE_PROP_SCORE_SUB_CLASSES,scoreSubClasses);
                 superCl.writeSemantic();
             }
             //The item which had the semantic item to be deleted as first super class
@@ -442,7 +439,7 @@ public class scoreForgetting {
             //read the current ontology state
             ind. readSemantic();
             //delete its score from the total episodic score
-            deleteTotalEpisodicScore(ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_HAS_SCORE));
+            updateTotalEpisodicScore(ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_HAS_SCORE),0);
             //declaration of the Set which will contain the name of the classes which this individual belongs to
             Set<String> classNames= new HashSet<String>();
             //read the ontology to get such information
@@ -457,22 +454,20 @@ public class scoreForgetting {
                 classBelong.readSemantic();
                 classBelong.removeObject(SCORE_OBJ_PROP_HAS_INDIVIDUAL,name);
                 int numberOfBelongingIndividual=(int) ValueOfDataPropertyFloat(classBelong.getDataIndividual(),SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL)-1;
-                float scoreOfBelongingIndividual= ValueOfDataPropertyFloat(classBelong.getDataIndividual(),SCORE_PROP_SCORE_BELONGING_INDIVIDUAL)-
+                float scoreOfBelongingIndividual= ValueOfDataPropertyFloat(classBelong.getDataIndividual(),SCORE_PROP_SCORE_SUM_BELONGING_INDIVIDUAL)-
                         ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_HAS_SCORE);
-                float newScore=(float) computeScore((int) ValueOfDataPropertyFloat(classBelong.getDataIndividual(),SCORE_PROP_NUMBER_SUB_CLASSES),
-                        ValueOfDataPropertyFloat(classBelong.getDataIndividual(),SCORE_PROP_SCORE_SUB_CLASSES),
-                        numberOfBelongingIndividual,scoreOfBelongingIndividual,
-                        (int) ValueOfDataPropertyFloat(classBelong.getDataIndividual(),SCORE_PROP_NUMBER_RETRIEVAL));
+                classBelong.removeData(SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL);
+                classBelong.addData(SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL,numberOfBelongingIndividual);
+                classBelong.removeData(SCORE_PROP_SCORE_SUM_BELONGING_INDIVIDUAL);
+                classBelong.addData(SCORE_PROP_SCORE_SUM_BELONGING_INDIVIDUAL,scoreOfBelongingIndividual);
+                classBelong.writeSemantic();
+                float newScore= computeScore(classBelong);
                 UpdateSemanticScore(ValueOfDataPropertyFloat(classBelong.getDataIndividual(),SCORE_PROP_HAS_SCORE),newScore);
                 Set<String> superClasses= new HashSet<String>();
                 objectProperty(classBelong.getObjectIndividual(),SCORE_OBJ_PROP_IS_SUB_CLASS_OF,superClasses);
                 updateSuperClassScore(superClasses,ValueOfDataPropertyFloat(classBelong.getDataIndividual(),SCORE_PROP_HAS_SCORE),newScore);
                 classBelong.removeData(SCORE_PROP_HAS_SCORE);
                 classBelong.addData(SCORE_PROP_HAS_SCORE,newScore);
-                classBelong.removeData(SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL);
-                classBelong.addData(SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL,numberOfBelongingIndividual);
-                classBelong.removeData(SCORE_PROP_SCORE_BELONGING_INDIVIDUAL);
-                classBelong.addData(SCORE_PROP_SCORE_BELONGING_INDIVIDUAL,scoreOfBelongingIndividual);
                 classBelong.writeSemantic();
             }
 
@@ -481,56 +476,55 @@ public class scoreForgetting {
         }
 
     }
-    //compute the  score when it is a semantic item
-    //inputs :
-    //-number of SubClasses
-    //-score of subclasses
-    //-number of belonging individual
-    //-score of belonging individual
-    //-number of retrieval
-    //output :score
-    private double computeScore(int numberSubClasses,float scoreSubClasses,
-                                int numberBelongingIndividual,float scoreIndividual,
-                                int retrieval){
-        //read the current state of total semantic score
+    private float computeScore(MORFullIndividual ind){
+        //read the current state of the ontology
+        ind.readSemantic();
         totalScore.readSemantic();
         totalScoreEpisodic.readSemantic();
-        //if the value is 0 then it means that it is the first element to be created
-        //hence its score is simply equal to 0.4 (number of retrieval*weight)
-        if(ValueOfDataPropertyFloat(totalScore.getDataIndividual(),SCORE_PROP_HAS_VALUE)==0){
-            return (SEMANTIC_WEIGHT_5*retrieval);
+        float scoreSubClasses;
+        float scoreIndividual;
+        int retrieval= (int) ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_NUMBER_RETRIEVAL);
+        int numberBelongingIndividual=(int) ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL);
+
+        int numberSubClasses= (int) ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_NUMBER_SUB_CLASSES);
+        //if the total semantic is equal to 0
+        if(ValueOfDataPropertyFloat(totalScore.getDataIndividual(),SCORE_PROP_HAS_VALUE)<0){
+            scoreSubClasses=ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_SCORE_SUM_SUB_CLASSES);
         }
-        //if it is not the first item to be created then the score is equal to the weighted sum
-        if(ValueOfDataPropertyFloat(totalScoreEpisodic.getDataIndividual(),SCORE_PROP_HAS_VALUE)==0) {
-            return (SEMANTIC_WEIGHT_1 * numberBelongingIndividual +
-                    SEMANTIC_WEIGHT_2 * scoreIndividual +
-                    SEMANTIC_WEIGHT_3 * numberSubClasses +
-                    SEMANTIC_WEIGHT_4 * scoreSubClasses / ValueOfDataPropertyFloat(totalScore.getDataIndividual(), SCORE_PROP_HAS_VALUE) +
-                    SEMANTIC_WEIGHT_5 * retrieval);
+        else {
+            scoreSubClasses=0;
         }
-        return  (SEMANTIC_WEIGHT_1 * numberBelongingIndividual +
-                SEMANTIC_WEIGHT_2 * scoreIndividual/ValueOfDataPropertyFloat(totalScoreEpisodic.getDataIndividual(),SCORE_PROP_HAS_VALUE) +
+        // if the total episodic is equal to 0
+        if(ValueOfDataPropertyFloat(totalScoreEpisodic.getDataIndividual(),SCORE_PROP_HAS_VALUE)<0) {
+
+            scoreIndividual= 1;
+
+        }
+        else{
+            scoreIndividual=ValueOfDataPropertyFloat(ind.getDataIndividual(),SCORE_PROP_SCORE_BELONGING_INDIVIDUAL);
+        }
+        ind.removeData(SCORE_PROP_SCORE_SUB_CLASSES);
+        ind.removeData(SCORE_PROP_SCORE_BELONGING_INDIVIDUAL);
+        ind.writeSemantic();
+        return  ((float ) (SEMANTIC_WEIGHT_1 * numberBelongingIndividual +
+                SEMANTIC_WEIGHT_2 * scoreIndividual +
                 SEMANTIC_WEIGHT_3 * numberSubClasses +
-                SEMANTIC_WEIGHT_4 * scoreSubClasses / ValueOfDataPropertyFloat(totalScore.getDataIndividual(), SCORE_PROP_HAS_VALUE) +
-                SEMANTIC_WEIGHT_5 * retrieval);
+                SEMANTIC_WEIGHT_4 * scoreSubClasses +
+                SEMANTIC_WEIGHT_5 * retrieval));
+    };
+    //compute the score for an episodic item
+    //inputs:
+    //-number of semantic retrieval
+    //-number of episodic retrieval
+    //output: score
+
+    private  float computeScore(int semantic_retrieval,
+                                int episodic_retrieval){
+        return((float) (EPISODIC_WEIGHT_1*semantic_retrieval+
+                EPISODIC_WEIGHT_2*episodic_retrieval));
+
     };
 
-    public void RemoveFromTotalSemanticScore(float score){
-        //read the current state of the total semnatic score
-        totalScore.readSemantic();
-        //reading the data property
-        MORAxioms.DataSemantics dataprop=totalScore.getDataIndividual();
-        //read the value of hasvalue data property
-        float oldTotal=ValueOfDataPropertyFloat(dataprop,SCORE_PROP_HAS_VALUE);
-        //change the value by adding the new score
-        oldTotal-=score;
-        //change the dataproperty value
-        totalScore.removeData(SCORE_PROP_HAS_VALUE);
-        totalScore.writeSemantic();
-        totalScore.addData(SCORE_PROP_HAS_VALUE,oldTotal);
-        totalScore.writeSemantic();
-        //  assertSemantic();
-    }
     public void UpdateSemanticScore(float oldScore, float newScore){
         //read the current state of total semantic item
         totalScore.readSemantic();
@@ -549,15 +543,8 @@ public class scoreForgetting {
         //assertSemantic();
 
     }
-
-    public void deleteTotalEpisodicScore(float score){
-        totalScoreEpisodic.readSemantic();
-        float total=ValueOfDataPropertyFloat(totalScoreEpisodic.getDataIndividual(),SCORE_PROP_HAS_VALUE);
-        total-=score;
-        totalScoreEpisodic.removeData(SCORE_PROP_HAS_VALUE);
-        totalScoreEpisodic.addData(SCORE_PROP_HAS_VALUE,total);
-        totalScoreEpisodic.writeSemantic();
-    }
+    //function which compute the sum of the score of the subclasses
+    //input: subclass names
     public void updateTotalEpisodicScore(float oldScore,float newScore){
         totalScoreEpisodic.readSemantic();
         float total=ValueOfDataPropertyFloat(totalScoreEpisodic.getDataIndividual(),SCORE_PROP_HAS_VALUE);
@@ -590,40 +577,84 @@ public class scoreForgetting {
             //take data properties
             MORAxioms.DataSemantics dataProp=superClasses.getDataIndividual();
             //update the subclasses score with the new one
-            float scoreSubClasses=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_SUB_CLASSES);
+            float scoreSubClasses=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_SUM_SUB_CLASSES);
             scoreSubClasses-=scoreOld;
             scoreSubClasses+=scoreNew;
+            superClasses.removeData(SCORE_PROP_SCORE_SUM_SUB_CLASSES);
+            superClasses.addData(SCORE_PROP_SCORE_SUM_SUB_CLASSES,scoreSubClasses);
+            superClasses.writeSemantic();
             //compute the new score
-            float newScore=(float) computeScore((int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_SUB_CLASSES),
-                    scoreSubClasses,
-                    (int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_BELONGING_INDIVIDUAL),
-                    ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_BELONGING_INDIVIDUAL),
-                    (int)ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_RETRIEVAL));
+            float newScore=computeScore(superClasses);
             //store the old score
             float oldScore=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_HAS_SCORE);
             //change the value of the data prop score
             superClasses.removeData(SCORE_PROP_HAS_SCORE);
             superClasses.addData(SCORE_PROP_HAS_SCORE,newScore);
-            superClasses.removeData(SCORE_PROP_SCORE_SUB_CLASSES);
-            superClasses.addData(SCORE_PROP_SCORE_SUB_CLASSES,scoreSubClasses);
             //write the semantic
             superClasses.writeSemantic();
             superClasses.readSemantic();
             //find the super classes of such element
             MORAxioms.ObjectSemantics objProp = superClasses.getObjectIndividual();
-            Set<String> classes = new HashSet<String>();
             //check if there is any superclasses
-            for (MORAxioms.ObjectSemantic obj : objProp) {
-                if (obj.toString().contains(SCORE_OBJ_PROP_IS_SUB_CLASS_OF)) {
-                    MORAxioms.Individuals ind = obj.getValues();
-                    for (OWLNamedIndividual i : ind) {
-                        //add to the string the new individual
-                        classes.add(i.toStringID().substring(IRI_ONTO.length() + 1));
-                    }
+            Set<String> classes = new HashSet<String>();
+            objectProperty(objProp,SCORE_OBJ_PROP_IS_SUB_CLASS_OF,classes);
+            //update total semantic score
+            UpdateSemanticScore(oldScore,newScore);
+            //update superclasses score
+            updateSuperClassScore(classes,oldScore,newScore);
+        }
+    }
+    //update superclasses score when a new subclass has been added
+    //inputs :
+    //-name of the superclasses to be updated
+    //-score of the semantic item added
+    public void updateSuperClassScore(Set<String> setName,float score){
+        //if the set of string is empty hence there is no super class the functions
+        //automatically returns
 
-                }
-            }
-            //end check if subclasses
+        if(setName.isEmpty()){
+            return;
+        }
+        //for all the string
+        for (String name:setName) {
+            //define the MOR individual of such superclass
+            MORFullIndividual superClasses = new MORFullIndividual(
+                    name,
+                    ONTO_NAME,
+                    FILE_PATH,
+                    IRI_ONTO
+
+            );
+            System.out.println(name);
+            //read the ontology
+            superClasses.readSemantic();
+            //take data property
+            MORAxioms.DataSemantics dataProp=superClasses.getDataIndividual();
+            //update the subclasses score with the new one
+            float scoreSubClasses=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_SCORE_SUM_SUB_CLASSES);
+            scoreSubClasses+=score;
+            superClasses.removeData(SCORE_PROP_SCORE_SUM_SUB_CLASSES);
+            superClasses.addData(SCORE_PROP_SCORE_SUM_SUB_CLASSES,scoreSubClasses);
+            int numberSubClasses=(int) ValueOfDataPropertyFloat(dataProp,SCORE_PROP_NUMBER_SUB_CLASSES);
+            numberSubClasses++;
+            superClasses.removeData(SCORE_PROP_NUMBER_SUB_CLASSES);
+            superClasses.addData(SCORE_PROP_NUMBER_SUB_CLASSES,numberSubClasses);
+            superClasses.writeSemantic();
+            //compute the new score
+            float newScore= computeScore(superClasses);
+            //store the old score
+            float oldScore=ValueOfDataPropertyFloat(dataProp,SCORE_PROP_HAS_SCORE);
+            //change the value of the data prop score
+            superClasses.removeData(SCORE_PROP_HAS_SCORE);
+            superClasses.addData(SCORE_PROP_HAS_SCORE,newScore);
+            //write the semantic
+            superClasses.writeSemantic();
+            superClasses.readSemantic();
+            //find the super classes of such element
+            MORAxioms.ObjectSemantics objProp = superClasses.getObjectIndividual();
+            //check if there is any subclasses
+            Set<String> classes = new HashSet<String>();
+            objectProperty(objProp,SCORE_OBJ_PROP_IS_SUB_CLASS_OF,classes);
             //update total semantic score
             UpdateSemanticScore(oldScore,newScore);
             //update superclasses score
